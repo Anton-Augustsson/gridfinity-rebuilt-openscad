@@ -29,17 +29,17 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 1;  
+gridx = 2;  
 // number of bases along y-axis   
 gridy = 2;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 6;
+gridz = 4;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
-divx = 1;
+divx = 0;
 // number of y Divisions (set to zero to have solid bin)
-divy = 1;
+divy = 0;
 
 /* [Height] */
 // determine what the variable "gridz" applies to based on your use case
@@ -51,13 +51,15 @@ enable_zsnap = false;
 
 /* [Features] */
 // the type of tabs
-style_tab = 1; //[0:Full,1:Auto,2:Left,3:Center,4:Right,5:None]
+style_tab = 5; //[0:Full,1:Auto,2:Left,3:Center,4:Right,5:None]
 // how should the top lip act
 style_lip = 0; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and retain height]
 // scoop weight percentage. 0 disables scoop, 1 is regular scoop. Any real number will scale the scoop. 
-scoop = 1; //[0:0.1:1]
+scoop = 0; //[0:0.1:1]
 // only cut magnet/screw holes at the corners of the bin to save uneccesary print time
 only_corners = false;
+// Midle devider 
+devider = true;
 
 /* [Base] */
 style_hole = 3; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit]
@@ -69,69 +71,51 @@ div_base_y = 0;
 
 
 // ===== IMPLEMENTATION ===== //
+//height = 37;
+//height = 23.7;
+height = 23.7;
+height_devider = 22.3;
+width = 41*gridx;
+width_grid = 41*gridx;
+num_deviders = 7;
 
-module smdComponentMagazinesRail() {
-    width = 70; // magazine
-    lenght = 83.5; // 2 units
-    t_foam = 4.5; // foam thicknesss
 
-    t_front = 5; // thickness front
-    h_front = 4.5+t_foam;
-    angle_front = 10; // degrees
+difference(){
+    union(){
+    color("tomato") {
+    gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
-    front_hangover = 5;
-    angle_back = 45; // degrees
-    t_back = 4;
-    h_back = 11+t_foam;
-    t_back_hangover = 6.5;
-    h_back_hangover = 4; 
-
-    d_between_front_back = 58.5; // distance bweteen front and back
-
-    // front rail part
-    difference() {
-        union() {
-            translate([-t_front,-lenght/2,0])
-            cube([t_front,lenght,h_front]);
-
-            translate([-t_front,-lenght/2,h_front])
-            cube([t_front+front_hangover,lenght,4]);
-        }
-        union() {
-            translate([0,lenght/2,h_front])
-            rotate([180,-angle_front,0])
-            cube([t_front+front_hangover,lenght,h_front]);
-        }
+    if (divx > 0 && divy > 0)
+    cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
     }
 
-    // back rail part
-    translate([d_between_front_back,0,0])
-    union() {
-        translate([0,-lenght/2,0])
-        cube([t_front,lenght,t_foam/2]);
+    gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
 
-        translate([0,-lenght/2,0])
-        cube([t_back,lenght,h_back-h_back_hangover]);
+    if (devider)
+    for ( i = [1:1:num_deviders])
+        translate([width/(num_deviders+1)*i-width/2,0,height/2+5])
+        cube([2,width,height_devider], center = true);
+    }
+    }
 
-        translate([0,-lenght/2,h_back-h_back_hangover])
-        difference() {
-            cube([t_back_hangover,lenght,h_back_hangover]);
-        
-            union() {
-                translate([t_back,0,h_back_hangover])
-                rotate([0,angle_back,0])
-                cube([t_back_hangover,lenght,h_back_hangover]);
+    union(){
+    translate([0,0,28])
+    cube([width+4,10,15], center = true);
 
-                translate([0,0,3*h_back_hangover/4])
-                rotate([0,-angle_back,0])
-                cube([t_back_hangover,lenght,h_back_hangover]);
-            }
-        }
-    }   
+    difference(){
+    translate([0,0,19.4])
+    cube([width-4,79.5,21.5], center = true);
+
+    union(){
+        if (devider)
+        for ( i = [1:1:num_deviders])
+        translate([width/(num_deviders+1)*i-width/2,0,height/2+5])
+        cube([2,width,height], center = true);
+    }
+    }
+    }
 }
-
-t_base = 6.47; // base thickness
-translate([-33,0,t_base])
-smdComponentMagazinesRail();
-gridfinityBase(2, 2, 42, 0, 0, 1);
-
+//translate([0,0,16.6]) // center
+//translate([-35.5,0,16.6]) // left
+//translate([-25.5,0,16.6])
+//cube([6.5,79,24.6], center = true);

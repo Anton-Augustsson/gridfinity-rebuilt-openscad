@@ -29,17 +29,17 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 2;  
+gridx = 3;  
 // number of bases along y-axis   
-gridy = 2;  
+gridy = 1;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 4;
+gridz = 7;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
-divx = 1;
+divx = 0;
 // number of y Divisions (set to zero to have solid bin)
-divy = 1;
+divy = 0;
 
 /* [Height] */
 // determine what the variable "gridz" applies to based on your use case
@@ -53,7 +53,7 @@ enable_zsnap = false;
 // the type of tabs
 style_tab = 5; //[0:Full,1:Auto,2:Left,3:Center,4:Right,5:None]
 // how should the top lip act
-style_lip = 0; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and retain height]
+style_lip = 2; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and retain height]
 // scoop weight percentage. 0 disables scoop, 1 is regular scoop. Any real number will scale the scoop. 
 scoop = 0; //[0:0.1:1]
 // only cut magnet/screw holes at the corners of the bin to save uneccesary print time
@@ -70,6 +70,8 @@ div_base_y = 0;
 
 // ===== IMPLEMENTATION ===== //
 
+difference() {
+union() {
 color("tomato") {
 gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
@@ -77,9 +79,47 @@ gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap
     cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
 }
 gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
+}
+}
+union(){
+length = 41.5;
+width = 25;
+translate([0,0,3.8+2.5+7*gridz/2])
+cube([width,length,7*gridz], center=true);
 
+translate([length,0,3.8+2.5+7*gridz/2])
+cube([width,length,7*gridz], center=true);
+
+translate([-length,0,3.8+2.5+7*gridz/2])
+cube([width,length,7*gridz], center=true);
+
+translate([length,0,0])
+cylinder(h=3.8+3, d=3.2);
+translate([length,0,0])
+cylinder(h=3.8, d=7);
+
+translate([-length,0,0])
+cylinder(h=3.8+3, d=3.2);
+translate([-length,0,0])
+cylinder(h=3.8, d=7);
+
+cylinder(h=3.8+3, d=3.2);
+cylinder(h=3.8, d=7);
+}
 }
 
+nut_width = 5.7;
+long_nose_plier_width = 16.5;
+
+translate([41.5,0,3.8+2.5+24/2+1])
+difference() {
+cube([24,41.5,24], center=true);
+
+union() {
+translate([0,0,2.5])
+cube([nut_width,41.5,24], center=true);
+}
+}
 
 // ===== EXAMPLES ===== //
 

@@ -31,15 +31,15 @@ $fs = 0.25;
 // number of bases along x-axis
 gridx = 2;  
 // number of bases along y-axis   
-gridy = 2;  
+gridy = 4;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 4;
+gridz = 2;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
-divx = 1;
+divx = 0;
 // number of y Divisions (set to zero to have solid bin)
-divy = 1;
+divy = 0;
 
 /* [Height] */
 // determine what the variable "gridz" applies to based on your use case
@@ -53,16 +53,14 @@ enable_zsnap = false;
 // the type of tabs
 style_tab = 5; //[0:Full,1:Auto,2:Left,3:Center,4:Right,5:None]
 // how should the top lip act
-style_lip = 0; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and retain height]
+style_lip = 1; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and retain height]
 // scoop weight percentage. 0 disables scoop, 1 is regular scoop. Any real number will scale the scoop. 
 scoop = 0; //[0:0.1:1]
 // only cut magnet/screw holes at the corners of the bin to save uneccesary print time
-only_corners = false;
-// Midle devider 
-devider = true;
+only_corners = true;
 
 /* [Base] */
-style_hole = 3; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit]
+style_hole = 4; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit, 4: Gridfinity Refined hole - no glue needed]
 // number of divisions per 1 unit of base along the X axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_x = 0;
 // number of divisions per 1 unit of base along the Y axis. (default 1, only use integers. 0 means automatically guess the right division)
@@ -71,51 +69,30 @@ div_base_y = 0;
 
 
 // ===== IMPLEMENTATION ===== //
-//height = 37;
-//height = 23.7;
-height = 23.7;
-height_devider = 22.3;
-width = 41*gridx;
-width_grid = 41*gridx;
-num_deviders = 7;
 
-
-difference(){
-    union(){
-    color("tomato") {
-    gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
+difference() {
+union() {
+color("tomato") {
+gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
     if (divx > 0 && divy > 0)
     cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
-    }
-
-    gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
-
-    if (devider)
-    for ( i = [1:1:num_deviders])
-        translate([width/(num_deviders+1)*i-width/2,0,height/2+5])
-        cube([2,width,height_devider], center = true);
-    }
-    }
-
-    union(){
-    translate([0,0,28])
-    cube([width+4,10,15], center = true);
-
-    difference(){
-    translate([0,0,19.4])
-    cube([width-4,79.5,21.5], center = true);
-
-    union(){
-        if (devider)
-        for ( i = [1:1:num_deviders])
-        translate([width/(num_deviders+1)*i-width/2,0,height/2+5])
-        cube([2,width,height], center = true);
-    }
-    }
-    }
 }
-//translate([0,0,16.6]) // center
-//translate([-35.5,0,16.6]) // left
-//translate([-25.5,0,16.6])
-//cube([6.5,79,24.6], center = true);
+gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
+
+}
+}
+
+union() {
+grid_width = 42.2;
+translate([-grid_width,-grid_width])
+cube([grid_width*2,grid_width*2,3.8+1]);
+
+pen_width = 10.6;
+num_pen = 7;
+for (i = [0:1:num_pen-1])
+translate([pen_width/2-pen_width*num_pen/2+(pen_width)*i,0,17])
+rotate([0,45,0])
+cube([pen_width,150,10], center = true);
+}
+}

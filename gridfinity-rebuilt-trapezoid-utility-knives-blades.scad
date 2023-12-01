@@ -29,17 +29,17 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 2;  
+gridx = 4;  
 // number of bases along y-axis   
-gridy = 2;  
+gridy = 1;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 4;
+gridz = 2;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
-divx = 1;
+divx = 0;
 // number of y Divisions (set to zero to have solid bin)
-divy = 1;
+divy = 0;
 
 /* [Height] */
 // determine what the variable "gridz" applies to based on your use case
@@ -66,10 +66,30 @@ div_base_x = 0;
 // number of divisions per 1 unit of base along the Y axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_y = 0; 
 
+/* [Trapezoid] */
+TrapezoidPoints = [
+    [ 0  ,  0  , 0  ],  // 0
+    [60.2,  0  , 0  ],  // 1
+    [45.7, 19.2, 0  ],  // 2
+    [14.5, 19.2, 0  ],  // 3
+    [ 0  ,  0  , 1.2],  // 4
+    [60.2,  0  , 1.2],  // 5
+    [45.7, 19.2, 1.2],  // 6
+    [14.5, 19.2, 1.2]]; // 7
+
+TrapezoidFace = [
+    [0,1,2,3],  // bottom
+    [4,5,1,0],  // front
+    [7,6,5,4],  // top
+    [5,6,2,1],  // right
+    [6,7,3,2],  // back
+    [7,4,0,3]]; // left
 
 
 // ===== IMPLEMENTATION ===== //
 
+difference(){
+union() {
 color("tomato") {
 gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
@@ -77,82 +97,26 @@ gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap
     cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
 }
 gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
-
+}
 }
 
+num_blades_stack = 6;
+start_hight = 3.8+1.81;
+union() {
+    translate([8,-9.6-3,start_hight])
+    for ( i = [0:1.2:1.2*num_blades_stack])
+    translate([0,0,i])
+    polyhedron( TrapezoidPoints, TrapezoidFace );
 
-// ===== EXAMPLES ===== //
+    translate([-60.2-8,-9.6-3,start_hight])
+    for ( i = [0:1.2:1.2*num_blades_stack])
+    translate([0,0,i])
+    polyhedron( TrapezoidPoints, TrapezoidFace );
 
-// 3x3 even spaced grid
-/*
-gridfinityInit(3, 3, height(6), 0, 42) {
-	cutEqual(n_divx = 3, n_divy = 3, style_tab = 0, scoop_weight = 0);
+    translate([-38,10,start_hight-0.02+15/2])
+    cube([20,30,15], center=true);
+
+    translate([38,10,start_hight-0.02+15/2])
+    cube([20,30,15], center=true);
 }
-gridfinityBase(3, 3, 42, 0, 0, 1);
-*/
-
-// Compartments can be placed anywhere (this includes non-integer positions like 1/2 or 1/3). The grid is defined as (0,0) being the bottom left corner of the bin, with each unit being 1 base long. Each cut() module is a compartment, with the first four values defining the area that should be made into a compartment (X coord, Y coord, width, and height). These values should all be positive. t is the tab style of the compartment (0:full, 1:auto, 2:left, 3:center, 4:right, 5:none). s is a toggle for the bottom scoop. 
-/*
-gridfinityInit(3, 3, height(6), 0, 42) {
-    cut(x=0, y=0, w=1.5, h=0.5, t=5, s=0);
-    cut(0, 0.5, 1.5, 0.5, 5, 0);
-    cut(0, 1, 1.5, 0.5, 5, 0);
-    
-    cut(0,1.5,0.5,1.5,5,0);
-    cut(0.5,1.5,0.5,1.5,5,0);
-    cut(1,1.5,0.5,1.5,5,0);
-    
-    cut(1.5, 0, 1.5, 5/3, 2);
-    cut(1.5, 5/3, 1.5, 4/3, 4);
 }
-gridfinityBase(3, 3, 42, 0, 0, 1);
-*/
-
-// Compartments can overlap! This allows for weirdly shaped compartments, such as this "2" bin. 
-/*
-gridfinityInit(3, 3, height(6), 0, 42)  {
-    cut(0,2,2,1,5,0);
-    cut(1,0,1,3,5);
-    cut(1,0,2,1,5);
-    cut(0,0,1,2);
-    cut(2,1,1,2);
-}
-gridfinityBase(3, 3, 42, 0, 0, 1);
-*/
-
-// Areas without a compartment are solid material, where you can put your own cutout shapes. using the cut_move() function, you can select an area, and any child shapes will be moved from the origin to the center of that area, and subtracted from the block. For example, a pattern of three cylinderical holes.
-/*
-gridfinityInit(3, 3, height(6), 0, 42) {
-    cut(x=0, y=0, w=2, h=3);
-    cut(x=0, y=0, w=3, h=1, t=5);
-    cut_move(x=2, y=1, w=1, h=2) 
-        pattern_linear(x=1, y=3, sx=42/2) 
-            cylinder(r=5, h=1000, center=true);
-}
-gridfinityBase(3, 3, 42, 0, 0, 1);
-*/
-
-// You can use loops as well as the bin dimensions to make different parametric functions, such as this one, which divides the box into columns, with a small 1x1 top compartment and a long vertical compartment below
-/*
-gx = 3;
-gy = 3;
-gridfinityInit(gx, gy, height(6), 0, 42) {
-    for(i=[0:gx-1]) {
-        cut(i,0,1,gx-1);
-        cut(i,gx-1,1,1);
-    }
-}
-gridfinityBase(gx, gy, 42, 0, 0, 1);
-*/
-
-// Pyramid scheme bin
-/*
-gx = 4.5;
-gy = 4;
-gridfinityInit(gx, gy, height(6), 0, 42) {
-    for (i = [0:gx-1]) 
-    for (j = [0:i])
-    cut(j*gx/(i+1),gy-i-1,gx/(i+1),1,0);
-}
-gridfinityBase(gx, gy, 42, 0, 0, 1);
-*/
