@@ -29,11 +29,11 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 4;  
+gridx = 1;  
 // number of bases along y-axis   
 gridy = 1;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 7;
+gridz = 8;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
@@ -57,63 +57,53 @@ style_lip = 0; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and 
 // scoop weight percentage. 0 disables scoop, 1 is regular scoop. Any real number will scale the scoop. 
 scoop = 0; //[0:0.1:1]
 // only cut magnet/screw holes at the corners of the bin to save uneccesary print time
-only_corners = true;
+only_corners = false;
+// Midle devider 
+devider = true;
 
 /* [Base] */
-style_hole = 4; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit, 4: Gridfinity Refined hole - no glue needed]
+style_hole = 3; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit]
 // number of divisions per 1 unit of base along the X axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_x = 0;
 // number of divisions per 1 unit of base along the Y axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_y = 0; 
 
 
-/* [Wave+] */
-margin = 1;
-lenght = 154+margin;
-width = 19.4+margin;
-height = 33.5;
-
 // ===== IMPLEMENTATION ===== //
+//height = 37;
+//height = 23.7;
+height = 23.7;
+height_devider = 22.3;
+width = 41*gridx;
+width_grid = 41*gridx;
+num_deviders = 7;
 
-difference(){
 
-union() {
-color("tomato") {
-gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
+difference() {
+    union() {
+        color("tomato") {
+        gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
-    if (divx > 0 && divy > 0)
-    cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
-}
-gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
-}
-}
+        if (divx > 0 && divy > 0)
+        cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
+        }
 
-union() {
-translate([0,0,(height+10)/2+3.8+2])
-cube([lenght, width, height+10], center=true);
+        gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
+        }
+    }
 
-grid_width = 41.5;
-translate([0,(grid_width-width)/2,(height)/2+3.8+2+9])
-cube([30, width, height+9], center=true);
+    // 10
+    union() {
+        translate([0, -12, 45/2+8+40])
+        #cube([60, 3.2, 45], center=true);
 
-translate([0,(-grid_width+width)/2,(height)/2+3.8+2+9])
-cube([60, width, height+9], center=true);
+        translate([0, 8, 10+8])
+        #difference() {
+            translate([0, 0, 25])
+            cube([60, 25.5, 50], center=true);
 
-translate([0,-width/2,(8)/2+3.8+2+height+5])
-rotate([45,0,0])
-cube([lenght, 4, 8], center=true);
-
-translate([0,width/2,(8)/2+3.8+2+height+5])
-rotate([-45,0,0])
-cube([lenght, 4, 8], center=true);
-
-translate([lenght/2,0,(8)/2+3.8+2+height+8])
-rotate([0,45,0])
-cube([4, width+6, 4], center=true);
-
-translate([-lenght/2,0,(8)/2+3.8+2+height+8])
-rotate([0,-45,0])
-cube([4, width+6, 4], center=true);
-
-}
+            translate([0, 0, 1])
+            cube([60, 3, 2], center=true);
+        }
+    }
 }

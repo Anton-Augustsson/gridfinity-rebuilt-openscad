@@ -29,11 +29,11 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 4;  
+gridx = 1;  
 // number of bases along y-axis   
-gridy = 1;  
+gridy = 4;  
 // bin height. See bin height information and "gridz_define" below.  
-gridz = 7;
+gridz = 4;
 
 /* [Compartments] */
 // number of X Divisions (set to zero to have solid bin)
@@ -58,62 +58,59 @@ style_lip = 0; //[0: Regular lip, 1:remove lip subtractively, 2: remove lip and 
 scoop = 0; //[0:0.1:1]
 // only cut magnet/screw holes at the corners of the bin to save uneccesary print time
 only_corners = true;
+// Midle devider 
+devider = true;
 
 /* [Base] */
-style_hole = 4; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit, 4: Gridfinity Refined hole - no glue needed]
+style_hole = 3; // [0:no holes, 1:magnet holes only, 2: magnet and screw holes - no printable slit, 3: magnet and screw holes - printable slit]
 // number of divisions per 1 unit of base along the X axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_x = 0;
 // number of divisions per 1 unit of base along the Y axis. (default 1, only use integers. 0 means automatically guess the right division)
 div_base_y = 0; 
 
 
-/* [Wave+] */
-margin = 1;
-lenght = 154+margin;
-width = 19.4+margin;
-height = 33.5;
-
 // ===== IMPLEMENTATION ===== //
 
-difference(){
+difference() {
+    union() {
+        color("tomato") {
+        gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
 
-union() {
-color("tomato") {
-gridfinityInit(gridx, gridy, height(gridz, gridz_define, style_lip, enable_zsnap), height_internal) {
+        if (divx > 0 && divy > 0)
+        cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
+        }
 
-    if (divx > 0 && divy > 0)
-    cutEqual(n_divx = divx, n_divy = divy, style_tab = style_tab, scoop_weight = scoop);
-}
-gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
-}
-}
+        gridfinityBase(gridx, gridy, l_grid, div_base_x, div_base_y, style_hole, only_corners=only_corners);
+        }
+    }
 
-union() {
-translate([0,0,(height+10)/2+3.8+2])
-cube([lenght, width, height+10], center=true);
+    union() {
+    translate([-11,-145/2,15])
+    union() {
+        // Triangle in x-y plane with constant height in z-axis
 
-grid_width = 41.5;
-translate([0,(grid_width-width)/2,(height)/2+3.8+2+9])
-cube([30, width, height+9], center=true);
+        points = [
+            [0, 0],
+            [-14/2, 146],
+            [14/2, 146]
+        ];
 
-translate([0,(-grid_width+width)/2,(height)/2+3.8+2+9])
-cube([60, width, height+9], center=true);
+        triangle_height = 14;
 
-translate([0,-width/2,(8)/2+3.8+2+height+5])
-rotate([45,0,0])
-cube([lenght, 4, 8], center=true);
+        linear_extrude(height = triangle_height)
+            polygon(points);
 
-translate([0,width/2,(8)/2+3.8+2+height+5])
-rotate([-45,0,0])
-cube([lenght, 4, 8], center=true);
+        translate([-9.8/2,0,0])
+        cube([9.8,90,triangle_height]);
 
-translate([lenght/2,0,(8)/2+3.8+2+height+8])
-rotate([0,45,0])
-cube([4, width+6, 4], center=true);
+        translate([-12/2,50+40,0])
+        cube([12,40,triangle_height]);
 
-translate([-lenght/2,0,(8)/2+3.8+2+height+8])
-rotate([0,-45,0])
-cube([4, width+6, 4], center=true);
+        translate([-20/2,50,0])
+        cube([80,40,triangle_height+4]);
+    }
 
-}
+    #translate([10,0,25/2+3])
+    cube([11.8,150,25], center=true);
+    }
 }
