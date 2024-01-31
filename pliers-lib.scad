@@ -22,7 +22,8 @@ module plier_divider() {
     mount_width = 8;
     mount_length = 50;
     divider_thickness = 8;
-    divider_height = 100; // from bottom not from mount
+    divider_height = 96; // from bottom not from mount
+    divider_circle_height = 100;// the circle center point has this height
     divider_length = 27;
 
     difference() {
@@ -32,17 +33,22 @@ module plier_divider() {
             cube([mount_width,mount_length,mount_thickness], center=true);
 
             // Divider rectangle
-            translate([0,0,(divider_height-divider_length/2)/2])
-            cube([divider_thickness,divider_length,divider_height-divider_length/2], center=true);
+            translate([0,0,(divider_circle_height-divider_length/2)/2])
+            cube([divider_thickness,divider_length,divider_circle_height-divider_length/2], center=true);
 
             // Divider top circle
-            translate([-divider_thickness/2,0,divider_height-divider_length/2])
+            translate([-divider_thickness/2,0,divider_circle_height-divider_length/2])
             rotate([0,90,0])
             #cylinder(d=divider_length, h=divider_thickness);
         }
 
-        translate([0,0,-12/2])
-        #plier_divider_screws(12);
+        union() {
+            translate([0,0,-12/2])
+            #plier_divider_screws(12);
+
+            translate([0,0,divider_height+divider_length/4])
+            #cube([divider_thickness,divider_length,divider_length/2], center=true);
+        }
     }
 }
 
