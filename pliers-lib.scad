@@ -69,6 +69,7 @@ module plier_stand() {
     mount_length = 34;
     stand_height = 50; // from bottom not from mount
     stand_length = 30;
+    height = 12;
 
     difference() {
         union() {
@@ -79,8 +80,8 @@ module plier_stand() {
             cube([width,stand_length,stand_height], center=true);
         }
 
-        translate([0,0,-12/2])
-        plier_stand_screws(12);
+        translate([0,0,-height/2])
+        plier_stand_screws(height);
     }
 }
 
