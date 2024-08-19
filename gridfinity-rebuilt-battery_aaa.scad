@@ -70,10 +70,10 @@ div_base_y = 0;
 
 
 // ===== IMPLEMENTATION ===== //
+height = 4;
 
-module usb() {
-    translate([0,0,15/2])
-    cube([12.4, 5, 14], center=true);
+module aaa() {
+    cylinder(d=10.8, h=44.5);
 }
 
 
@@ -92,14 +92,23 @@ difference() {
     }
 
     union() {
-        translate([0,-13.5,3.4])
-        #usb();
+        translate([10,-13.5,height])
+        #aaa();
 
-        translate([0,0,3.4])
-        #usb();
+        translate([10,0,height])
+        #aaa();
 
-        translate([0,13.5,3.4])
-        #usb();
+        translate([10,13.5,height])
+        #aaa();
+
+        translate([-10,-13.5,height])
+        #aaa();
+
+        translate([-10,0,height])
+        #aaa();
+
+        translate([-10,13.5,height])
+        #aaa();
     }
 }
 

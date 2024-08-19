@@ -78,7 +78,7 @@ module microsd() {
 
 module sd() {
     translate([0,0,32/2])
-    cube([22.5, 2.4, 32], center=true);
+    cube([24.5, 2.4, 32], center=true);
 }
 
 
