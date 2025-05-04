@@ -17,9 +17,9 @@ $fs = 0.25;
 
 /* [General Settings] */
 // number of bases along x-axis
-gridx = 5;  
+gridx = 3;  
 // number of bases along y-axis   
-gridy = 5; 
+gridy = 3; 
 
 /* [Screw Together Settings - Defaults work for M3 and 4-40] */
 // screw diameter
@@ -47,7 +47,7 @@ fity = 0; // [-1:0.1:1]
 /* [Styles] */
 
 // baseplate styles
-style_plate = 0; // [0: thin, 1:weighted, 2:skeletonized, 3: screw together, 4: screw together minimal]
+style_plate = 3; // [0: thin, 1:weighted, 2:skeletonized, 3: screw together, 4: screw together minimal]
 
 // enable magnet hole
 enable_magnet = true; 
